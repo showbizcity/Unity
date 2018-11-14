@@ -1,0 +1,121 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Player : MonoBehaviour
+
+
+{
+    //ALL THIS MEANT TO CREATE VARIABLES
+    // All TURQUOISE STUFF = DATA TYPE
+
+    public CapsuleCollider playerCollider;
+    public float moveSpeed = 5f;
+
+   
+
+   //private GameObject enemy;
+    private Enemy enemyScript;
+
+    private RaycastHit hit;
+    private Ray ray;
+    public float rayDistance = 4f;
+
+
+
+   
+
+
+    // Use this for initialization
+    void Start ()
+    {
+
+        playerCollider = GetComponent<CapsuleCollider>();
+
+        playerCollider.isTrigger = false;
+
+        playerCollider.height = 1f;
+
+        playerCollider.center = new Vector3(0f, 0.5f, 0f);
+
+       // enemy = GameObject.Find("Battle_Dummy");
+        /*
+         * Below need to assiociate data to the <enemy script> variable
+        */
+       // enemyScript = enemy.GetComponent<Enemy>();
+
+        /*
+         * Below 2x enemy lines: 'we have now succesfully found the enemy game object, and then we have find the component of the enemyScript that's on the enemy game object self'
+         * 
+        */
+
+	}
+
+    // Update is called once per frame
+    void Update()
+    {
+        float moveHorizontal = Input.GetAxis("Horizontal"); // so <moveHorizontal> is custom generated variable. AND we need the () after GetAxis because it's a method
+                                                            // also <"Horizontal"> is a string value, so just looks at input of GetAxis
+        float moveVertical = Input.GetAxis("Vertical");     // also <"Horizontal"> as well as <"Vertical"> reverts back to Inputmanager Axis, since [Get Axis] in inspector, so can also be custom generated
+
+       // float moveUp = Input.GetAxis("Jump");
+
+        Vector3 movement = new Vector3(moveHorizontal, 0f, moveVertical);
+
+        //<vector 3> = function, <movement> = variable name
+
+        transform.Translate(movement * Time.deltaTime * moveSpeed);
+
+        ray = new Ray(transform.position + new Vector3(0f,playerCollider.center.y,0f), transform.forward);
+        Debug.DrawRay(ray.origin, ray.direction * rayDistance, Color.red);
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.distance < rayDistance)
+            {
+                print("We hit something!");
+                if (hit.collider.gameObject.tag == "Enemy")
+                {
+                    print("There is an enemy within range!");
+                    enemyScript = hit.collider.gameObject.GetComponent<Enemy>();
+                   
+                }
+            }
+        }
+
+
+        /*
+       if (Input.GetKeyDown(KeyCode.Space))
+
+            
+             * Below Enemyscript: 'we need to point to the script, that the enemyhealth variable is on.'
+             * 
+            
+        {
+            enemyScript.enemyHealth--;
+        }
+         */
+
+
+        //  print(moveHorizontal);
+    }
+
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Enemy")
+        {
+            enemyScript = collision.gameObject.GetComponent<Enemy>();
+
+            enemyScript.enemyHealth--;
+        }
+    }
+
+}
+/*
+COMPARE WITH VOID ONCOLLISION-PART
+enemy = GameObject.Find("Battle_Dummy");
+
+ * Below need to assiociate data to the <enemy script> variable
+*/
+// enemyScript = enemy.GetComponent<Enemy>();
